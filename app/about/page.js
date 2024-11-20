@@ -1,7 +1,7 @@
 import Tentang from "@/components/tentang";
 import Footer from "@/components/footer";
 
-function About() {
+function AboutPage() {
   return (
     <div>
       <main className="flex-grow">
@@ -12,4 +12,4 @@ function About() {
   );
 }
 
-export default About;
+export default AboutPage;
