@@ -1,4 +1,8 @@
+"use client";
+
 import React from 'react';
+import Image from "next/image";
+import Polnep from "@/images/hero.jpeg";
 
 const Hero = () => {
     return (
@@ -14,10 +18,11 @@ const Hero = () => {
 
 
                 <div className="relative mt-6 md:mt-0 w-full h-48 md:w-[320px] md:h-[200px] rounded-lg overflow-hidden shadow-lg">
-                    <img
-                        src="./hero.jpeg"
+                    <Image
+                        src={Polnep.src}
                         alt="Politeknik Negeri Pontianak"
-                        className="w-full h-full object-cover"
+                        width={400}
+                        height={300}
                     />
                     <div className="absolute bottom-2 left-2 text-white bg-opacity-50 text-center font-bold text-lg md:text-lg px-2 py-1 rounded">
                         POLITEKNIK NEGERI PONTIANAK

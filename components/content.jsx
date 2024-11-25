@@ -1,4 +1,9 @@
+"use client";
+
 import React from "react";
+import Image from "next/image";
+import Internet from "@/images/Internet.jpg";
+import Ppks from "@/images/PPKS.jpg";
 
 const Content = () => {
   return (
@@ -15,10 +20,11 @@ const Content = () => {
           className="flex flex-col items-center justify-center w-full max-w-sm bg-white border-2 border-cyan-300 rounded-xl p-8 shadow-lg hover:shadow-xl transition duration-300 focus:ring-2 focus:ring-cyan-400"
         >
           <div className="w-24 h-24 mb-6 rounded-full overflow-hidden border-2 border-cyan-300">
-            <img
-              src="./internet.jpg"
+            <Image
+              src={Internet.src}
               alt="Internet Icon"
-              className="w-full h-full object-cover"
+              width={100}
+              height={100}              
             />
           </div>
           <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">
@@ -35,10 +41,11 @@ const Content = () => {
           className="flex flex-col items-center justify-center w-full max-w-sm bg-white border-2 border-cyan-300 rounded-xl p-8 shadow-lg hover:shadow-xl transition duration-300 focus:ring-2 focus:ring-cyan-400"
         >
           <div className="w-24 h-24 mb-6 rounded-full overflow-hidden border-2 border-cyan-300">
-            <img
-              src="./PPKS.jpg"
+            <Image
+              src={Ppks.src}
               alt="PPKS Icon"
-              className="w-full h-full object-cover"
+              width={100}
+              height={100} 
             />
           </div>
           <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">

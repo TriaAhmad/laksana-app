@@ -1,11 +1,11 @@
-import Tentang from "@/components/tentang";
+import Form from "@/components/form";
 import Footer from "@/components/footer";
 
 function AboutPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow">
-        <Tentang />
+        <Form />
       </main>
       <Footer />
     </div>

@@ -39,9 +39,9 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`text-sm font-medium transition-colors hover:text-cyan-400 ${
                   pathname === item.href
-                    ? "text-primary"
+                    ? "text-cyan-200"
                     : "text-muted-foreground"
                 }`}
               >
@@ -59,7 +59,7 @@ export default function Navbar() {
                 className="w-[200px] pl-8"
               />
             </div>
-            <Button size="sm">Cari</Button>
+            <Button size="sm" className="bg-cyan-400 hover:bg-cyan-200 text-black">Cari</Button>
           </div>
 
           <Button
@@ -85,9 +85,9 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`text-sm font-medium transition-colors hover:text-cyan-400 ${
                   pathname === item.href
-                    ? "text-primary"
+                    ? "text-cyan-200"
                     : "text-muted-foreground"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
