@@ -1,56 +1,116 @@
 "use client";
-import { useState } from "react";
-import { FaComments } from "react-icons/fa"; // Ikon untuk chatbot
+import Ballon from "@/components/chat/ballon";
+import { useEffect, useRef, useState } from "react";
+import { FaComments, FaTimes } from "react-icons/fa";
 
-export default function Chatbot() {
-  const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState("");
-  const [isOpen, setIsOpen] = useState(false); // Untuk menampilkan/menyembunyikan chatbox
+const Chatbot = _ => {
+    const chat_box = useRef(null);
+    const container_chat = useRef(null);
+    const t = new Date();
 
-  const sendMessage = async () => {
-    const res = await fetch("/api/chatbot", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
+    const [chatData, setChatData] = useState([{
+        isUser: false,
+        message: "Selamat datang dilaksana",
+        time: `${t.getHours()}:${t.getMinutes()}`
+    }]);
+    const [socket, setSocket] = useState(undefined);
+    const [text, setText] = useState("");
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const ws = new WebSocket("ws://localhost:8000");
 
-    const data = await res.json();
-    setResponse(data.message);
-  };
+    useEffect(() => {
+        ws.onopen = _ => {
+            setSocket(ws);
+        };
+        ws.onmessage = e => {
+            const data = JSON.parse(e.data);
+            const chat = {
+                message: data.message,
+                time: data.time,
+                isUser: false
+            };
+            setChatData(d => [...d, chat]);
+            setTimeout(() => {
+                container_chat.current?.scrollTo(0, chat_box.current?.scrollHeight);
+            }, 10);
+        };
+    }, []);
 
-  return (
-    <div className="fixed bottom-5 right-5 flex flex-col items-end z-50">
-      {/* Ikon Chatbot */}
-      <div
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-3 bg-cyan-600 text-white rounded-full cursor-pointer shadow-lg hover:bg-cyan-700 transition"
-      >
-        <FaComments size={24} />
-      </div>
+    const handleSendMessage = message => {
+        if (message.trim() === "") return;
+        const t = new Date();
+        const chat = {
+            message,
+            time: `${t.getHours()}:${t.getMinutes()}`,
+            isUser: true
+        };
+        setChatData(d => [...d, chat]);
+        socket.send(JSON.stringify(chat));
+        setText("");
+        container_chat.current?.scrollTo(0, chat_box.current?.scrollHeight);
+    };
 
-      {/* Chatbox */}
-      {isOpen && (
-        <div className="w-full sm:w-80 max-w-full bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 mt-4 border border-cyan-400">
-          <h2 className="text-xl font-semibold text-cyan-600 mb-4 text-center">Chatbot</h2>
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="w-full p-4 border border-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none min-h-[120px] placeholder-cyan-400"
-            placeholder="Tulis pesan Anda..."
-          />
-          <button
-            onClick={sendMessage}
-            className="w-full py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition duration-300"
-          >
-            Kirim
-          </button>
-          {response && (
-            <p className="mt-3 text-cyan-600 text-sm md:text-base text-center">
-              {response}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+    return (
+        <>
+            <div className="fixed bottom-4 right-4 z-50">
+                {!isChatOpen && (
+                    <button
+                        onClick={() => setIsChatOpen(true)}
+                        className="bg-cyan-500 text-white p-4 rounded-full shadow-lg hover:bg-cyan-800">
+                        <FaComments size={24} />
+                    </button>
+                )}
+
+                {isChatOpen && (
+                    <div className="w-full max-w-md h-[90vh] sm:h-[70vh] md:h-[80vh] lg:h-[85vh] bg-white rounded-lg shadow-lg flex flex-col overflow-hidden">
+                        <div className="bg-cyan-500 text-white p-4 flex justify-between items-center">
+                            <h2 className="text-lg font-bold">Chat</h2>
+                            <button
+                                onClick={() => setIsChatOpen(false)}
+                                className="text-white hover:text-gray-400">
+                                <FaTimes size={20} />
+                            </button>
+                        </div>
+
+                        <div
+                            ref={container_chat}
+                            className="flex-1 overflow-y-auto p-4">
+                            <div
+                                ref={chat_box}
+                                className="flex flex-col gap-2">
+                                {chatData.map((d, i) => (
+                                    <Ballon
+                                        key={i}
+                                        message={d.message}
+                                        time={d.time}
+                                        isUser={d.isUser}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="p-4 bg-slate-100 flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={text}
+                                onChange={e => setText(e.target.value)}
+                                onKeyDown={e => {
+                                    if (e.key === "Enter") handleSendMessage(text);
+                                }}
+                                className="flex-1 p-2 border rounded-lg"
+                                placeholder="Ketik pesan..."
+                            />
+                            <button
+                                onClick={() => handleSendMessage(text)}
+                                className="bg-cyan-500 text-white p-2 rounded-lg hover:bg-cyan-800">
+                                Kirim
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </>
+    );
+};
+
+export default Chatbot;
