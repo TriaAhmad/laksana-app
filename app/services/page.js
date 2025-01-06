@@ -1,5 +1,7 @@
+
 import Footer from "@/components/footer";
 import Hubungi from "@/components/hubungi";
+import Chatbot from "@/components/chatbot";
 
 const ServicePage = () => {
   return (
@@ -7,6 +9,7 @@ const ServicePage = () => {
       <main className="flex-grow">
         <Hubungi />
       </main>
+      <Chatbot />
       <Footer />
     </div>
   );

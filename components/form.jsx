@@ -1,13 +1,108 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
 
 const Form = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [nama, setNama] = useState("");
+  const [noIdentitas, setNoIdentitas] = useState("");
+  const [noHp, setNoHp] = useState("");
+  const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState("");
+  const [listUnit, setListUnit] = useState([]);
+  const [listKategori, setListKategori] = useState([]);
+  const [message, setMessage] = useState("");
+  const [unitKerja, setUnitKerja] = useState("");
+  const [kategori, setKategori] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+
+
+  const findPriority = (e) => {
+    e.preventDefault();
+    const {value} = e.target;
+    setPriority(value)
+  }
+
+  const findUnitKerja = (e) => {
+    e.preventDefault();
+    const { value } = e.target;
+    setUnitKerja(value)
   };
+
+  const findKategori = (e) => {
+    e.preventDefault();
+    const { value } = e.target;
+    setKategori(value)
+  };
+
+  const kirimform = async (e) => {
+    e.preventDefault()
+    if (!nama.length || !noIdentitas.length || !unitKerja.length || !noHp.length || !title.length || !message.length || !priority.length ||
+      !kategori.length
+    ) {
+      toast("Harap isi semua input formulirnya")
+
+      return
+    }
+
+    try {
+      setLoading(true)
+      const formsData = new FormData()
+      formsData.append("nama", nama)
+      formsData.append("no_identitas", noIdentitas)
+      formsData.append("unit", unitKerja)
+      formsData.append("no_hp", noHp)
+      formsData.append("title", title)
+      formsData.append("message", message)
+      formsData.append("priority", priority)
+      formsData.append("kategori_pekerjaan_id", kategori)
+
+      const response = await axios.post("https://laksana.polnep.ac.id/api/laporan", formsData)
+      if (response.data.success) {
+        toast(response.data.message)
+        setLoading(false)
+      } else {
+        toast("Gagal Mengirim Formulir Laporan")
+        setLoading(false)
+      }
+
+    } catch (error) {
+      toast("Gagal Mengirim Formulir Laporan")
+      setLoading(false)
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchListUnitKerja = async () => {
+      try {
+        const response = await axios.get("https://laksana.polnep.ac.id/api/unit")
+
+        setListUnit(response.data.data)
+        console.log(listUnit)
+      } catch (error) {
+
+      }
+    }
+
+    fetchListUnitKerja()
+  }, [])
+
+  useEffect(() => {
+    const fetchListKategori = async () => {
+      try {
+        const response = await axios.get("https://laksana.polnep.ac.id/api/kategori")
+
+        setListKategori(response.data.data)
+        console.log(listKategori)
+      } catch (error) {
+
+      }
+    }
+
+    fetchListKategori()
+  }, [])
 
   return (
     <div className="flex flex-col items-center justify-center my-10 min-h-screen bg-white p-4">
@@ -28,13 +123,15 @@ const Form = () => {
           </h2>
         </div>
 
-        <form className="p-4 md:p-6">
+        <form onSubmit={kirimform} className="p-4 md:p-6">
           {/* Nama dan No Telepon */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
             <div>
               <label className="block text-sm font-medium mb-1">Nama</label>
               <input
                 type="text"
+                value={nama}
+                onChange={event => setNama(event.target.value)}
                 placeholder="ketik nama anda"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
               />
@@ -43,6 +140,8 @@ const Form = () => {
               <label className="block text-sm font-medium mb-1">No Telepon</label>
               <input
                 type="text"
+                value={noHp}
+                onChange={event => setNoHp(event.target.value)}
                 placeholder="ketik nomor telepon "
                 className="w-full px-3 py-2  border border-gray-300 rounded-md focus:outline-none"
               />
@@ -55,19 +154,21 @@ const Form = () => {
               <label className="block text-sm font-medium mb-1">No Identitas</label>
               <input
                 type="text"
+                value={noIdentitas}
+                onChange={event => setNoIdentitas(event.target.value)}
                 placeholder="ketik nomor identitas NIK/NIM/NIP"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Unit Kerja</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-white">
+              <select onChange={findUnitKerja} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-white">
                 <option>--Pilih Unit Kerja--</option>
-                <option>UPA TIK POLNEP</option>
-                <option>HUMAS POLNEP</option>
-                <option>UMUM</option>
-                <option>Satgas PPKS</option>
-                <option>Kerumah Tanggapan</option>
+                {
+                  listUnit?.map(unit => (
+                    <option key={unit.id} value={unit.id}>{unit.nama}</option>
+                  ))
+                }
               </select>
             </div>
           </div>
@@ -77,6 +178,8 @@ const Form = () => {
             <label className="block text-sm font-medium mb-1">Judul</label>
             <input
               type="text"
+              value={title}
+              onChange={event => setTitle(event.target.value)}
               placeholder="ketik judul laporan"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             />
@@ -87,6 +190,8 @@ const Form = () => {
             <label className="block text-sm font-medium mb-1">Keterangan</label>
             <textarea
               placeholder="ketik Keterangan"
+              value={message}
+              onChange={event => setMessage(event.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
               rows="4"
             ></textarea>
@@ -96,120 +201,51 @@ const Form = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
             <div>
               <label className="block text-sm font-medium mb-2">Kategori Masalah</label>
-              <div className="flex flex-wrap gap-3">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="category"
-                    value="Internet"
-                    checked={selectedCategory === "Internet"}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="hidden"
-                  />
-                  <span className={`flex items-center gap-2 px-4 py-1.5 rounded-full border cursor-pointer ${
-                    selectedCategory === "Internet"
-                      ? "bg-cyan-400 text-white border-cyan-400"
-                      : "bg-white text-black border-cyan-400"
-                  }`}>
-                    <span className="w-4 h-4 border-2 border-current rounded-full flex items-center justify-center">
-                      {selectedCategory === "Internet" && (
-                        <span className="w-2 h-2 bg-white rounded-full"></span>
-                      )}
-                    </span>
-                    Internet
-                  </span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="category"
-                    value="PPKS"
-                    checked={selectedCategory === "PPKS"}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="hidden"
-                  />
-                  <span className={`flex items-center gap-2 px-4 py-1.5 rounded-full border cursor-pointer ${
-                    selectedCategory === "PPKS"
-                      ? "bg-cyan-400 text-white border-cyan-400"
-                      : "bg-white text-black border-cyan-400"
-                  }`}>
-                    <span className="w-4 h-4 border-2 border-current rounded-full flex items-center justify-center">
-                      {selectedCategory === "PPKS" && (
-                        <span className="w-2 h-2 bg-white rounded-full"></span>
-                      )}
-                    </span>
-                    PPKS
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Priority</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-white">
-                <option>LOW</option>
-                <option>MEDIUM</option>
-                <option>HIGH</option>
+              <select onChange={findKategori} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-white">
+                <option>--Pilih Kategori Masalah--</option>
+                {
+                  listKategori?.map(kategori => (
+                    <option key={kategori.id} value={kategori.id}>{kategori.kategori}</option>
+                  ))
+                }
               </select>
             </div>
-          </div>
 
-          {/* Upload File */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1">Upload File</label>
-            <div className="border-2 border-dashed border-cyan-400 rounded-md p-4 md:p-8 text-center">
-              {selectedFile ? (
-                <p className="text-sm text-cyan-500 truncate">
-                  {selectedFile.name}
-                </p>
-              ) : (
-                <>
-                  <div className="w-12 h-12 mx-auto mb-2">
-                    <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-cyan-400">
-                      <path
-                        d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 16.2091 19.2091 18 17 18H7C4.79086 18 3 16.2091 3 14C3 11.7909 4.79086 10 7 10Z"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <path
-                        d="M12 12V15M12 15L14 13M12 15L10 13"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-600">Drag and drop your files here</p>
-                  <p className="text-xs text-gray-400 mb-4">file supported: JPG, PNG, GIF</p>
-                </>
-              )}
-              <input
-                type="file"
-                className="hidden"
-                id="fileInput"
-                onChange={handleFileChange}
-              />
-              <label
-                htmlFor="fileInput"
-                className="px-4 py-2 bg-cyan-400 text-white rounded-full cursor-pointer hover:bg-cyan-500 inline-block"
-              >
-                Browse File
-              </label>
+            {/* Priority */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Priority</label>
+              <select onChange={findPriority} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-white">
+                <option>--Pilih Priority--</option>
+                <option value="low">LOW</option>
+                <option value="normal">NORMAL</option>
+                <option value="high">HIGH</option>
+              </select>
             </div>
           </div>
 
           {/* Submit Button */}
           <div className="text-center">
-            <button
-              type="submit"
-              className="px-8 py-2 bg-cyan-400 text-white font-medium rounded-full hover:bg-cyan-500"
-            >
-              Submit
-            </button>
+            {
+              loading ? (
+                <button
+                  type="submit"
+                  disabled
+                  className="px-8 py-2 bg-gray-400 text-black cursor-not-allowed font-medium rounded-full hover:bg-cyan-500"
+                >
+                  Loading....
+                </button>
+              )
+                : (<button
+                  type="submit"
+                  className="px-8 py-2 bg-cyan-400 text-white font-medium rounded-full hover:bg-cyan-500"
+                >
+                  Submit
+                </button>)
+            }
           </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 };

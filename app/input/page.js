@@ -1,5 +1,6 @@
 import Form from "@/components/form";
 import Footer from "@/components/footer";
+import Chatbot from "@/components/chatbot";
 
 function AboutPage() {
   return (
@@ -7,6 +8,7 @@ function AboutPage() {
       <main className="flex-grow">
         <Form />
       </main>
+      <Chatbot />
       <Footer />
     </div>
   );

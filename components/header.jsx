@@ -51,15 +51,6 @@ export default function Navbar() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search"
-                className="w-[200px] pl-8"
-              />
-            </div>
-            <Button size="sm" className="bg-cyan-400 hover:bg-cyan-200 text-black">Cari</Button>
           </div>
 
           <Button
@@ -96,15 +87,6 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="flex items-center gap-2 pt-2">
-              <div className="relative flex-grow">
-                <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search"
-                  className="w-full pl-8"
-                />
-              </div>
-              <Button size="sm">Cari</Button>
             </div>
           </nav>
         </div>
